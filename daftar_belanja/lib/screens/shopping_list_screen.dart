@@ -15,29 +15,27 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Daftar Belanja'),
-      ),
+      appBar: AppBar(title: const Text('Daftar Belanja')),
       body: Column(
-        children:[
+        children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
-              children:[
+              children: [
                 Expanded(
                   child: TextField(
                     controller: _controller,
                     decoration: const InputDecoration(
-                      hintText: 'Nama barang',
+                      hintText: 'Masukan nama barang',
                     ),
                   ),
                 ),
-                ElevatedButton(
+                IconButton(
+                  icon: const Icon(Icons.add),
                   onPressed: () {
                     _shoppingService.addShoppingItem(_controller.text);
                     _controller.clear();
                   },
-                  child: const Text('Tambah'),
                 ),
               ],
             ),
@@ -47,14 +45,14 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
               stream: _shoppingService.getShoppingList(),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
-                  final Map<String, dynamic> items = snapshot.data!;
+                  Map<String, dynamic> items = snapshot.data!;
                   return ListView.builder(
-                    itemCount: items.length,
+                    itemCount: snapshot.data!.length,
                     itemBuilder: (context, index) {
-                      final String key = items.keys.elementAt(index);
-                      final String value = items[key] as String;
+                      final key = items.keys.elementAt(index);
+                      final item = items[key];
                       return ListTile(
-                        title: Text(value),
+                        title: Text(item!),
                         trailing: IconButton(
                           icon: const Icon(Icons.delete),
                           onPressed: () {
@@ -64,10 +62,10 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
                       );
                     },
                   );
+                } else if (snapshot.hasError) {
+                  return const Center(child: Text('Terjadi kesalahan'));
                 } else {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
+                  return const Center(child: CircularProgressIndicator());
                 }
               },
             ),
